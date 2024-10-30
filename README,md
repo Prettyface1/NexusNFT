@@ -1,0 +1,196 @@
+# NexusNFT Marketplace
+
+NexusNFT is a decentralized NFT marketplace built on the Stacks blockchain using Clarity smart contracts. The platform enables users to mint, list, buy, and sell NFTs in a secure and transparent manner.
+
+## Table of Contents
+- [Features](#features)
+- [Contract Architecture](#contract-architecture)
+- [Function Documentation](#function-documentation)
+- [Error Codes](#error-codes)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+- [Security Considerations](#security-considerations)
+- [Testing](#testing)
+- [Contributing](#contributing)
+
+## Features
+
+- **NFT Minting**: Create new NFTs with custom metadata URLs
+- **Token Listings**: List NFTs for sale at a specified price
+- **Secure Transactions**: Built-in validation and security checks
+- **Ownership Management**: Robust token ownership tracking
+- **Metadata Support**: Support for external metadata storage
+
+## Contract Architecture
+
+### Data Structures
+
+1. **Tokens Map**
+```clarity
+(define-map tokens
+  { token-id: uint }
+  { owner: principal, metadata-url: (string-utf8 256) }
+)
+```
+
+2. **Listings Map**
+```clarity
+(define-map listings
+  { token-id: uint }
+  { price: uint, seller: principal }
+)
+```
+
+### Key Components
+
+- Auto-incrementing token ID system
+- Built-in validation functions
+- Secure ownership tracking
+- Price validation mechanism
+
+## Function Documentation
+
+### Public Functions
+
+1. **mint**
+```clarity
+(define-public (mint (metadata-url (string-utf8 256))))
+```
+- Creates a new NFT with specified metadata URL
+- Returns: Token ID (uint)
+- Requires: Valid metadata URL
+
+2. **list-token**
+```clarity
+(define-public (list-token (token-id uint) (price uint)))
+```
+- Lists an NFT for sale
+- Requires: Token ownership, valid price
+- Returns: Success/failure
+
+3. **unlist-token**
+```clarity
+(define-public (unlist-token (token-id uint)))
+```
+- Removes an NFT listing
+- Requires: Token ownership
+- Returns: Success/failure
+
+4. **buy-token**
+```clarity
+(define-public (buy-token (token-id uint)))
+```
+- Purchases a listed NFT
+- Handles: Payment transfer, ownership update
+- Returns: Success/failure
+
+### Read-Only Functions
+
+1. **get-token-owner**
+```clarity
+(define-read-only (get-token-owner (token-id uint)))
+```
+- Returns: Token owner's principal
+
+2. **get-listing**
+```clarity
+(define-read-only (get-listing (token-id uint)))
+```
+- Returns: Listing details if available
+
+3. **get-token-metadata**
+```clarity
+(define-read-only (get-token-metadata (token-id uint)))
+```
+- Returns: Token's metadata URL
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| u100 | Owner-only operation |
+| u101 | Not token owner |
+| u102 | Listing not found |
+| u103 | Wrong price |
+| u104 | Invalid token |
+| u105 | Invalid price |
+| u106 | Invalid metadata |
+| u107 | Self-transfer attempt |
+| u404 | Token not found |
+
+## Installation
+
+1. Install Clarinet:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install clarinet
+```
+
+2. Create a new project:
+```bash
+clarinet new nexus-nft
+cd nexus-nft
+```
+
+3. Deploy contract:
+```bash
+clarinet contract deploy
+```
+
+## Usage Examples
+
+### Minting an NFT
+```clarity
+(contract-call? .nexus-nft mint "https://metadata.example.com/token/1")
+```
+
+### Listing a Token
+```clarity
+(contract-call? .nexus-nft list-token u1 u100000000) ;; Price in microSTX
+```
+
+### Buying a Token
+```clarity
+(contract-call? .nexus-nft buy-token u1)
+```
+
+## Security Considerations
+
+1. **Input Validation**
+   - All user inputs are validated
+   - Metadata URLs must be non-empty
+   - Prices must be greater than zero
+
+2. **Ownership Checks**
+   - Only token owners can list/unlist
+   - Self-transfer prevention
+   - Secure ownership tracking
+
+3. **Transaction Safety**
+   - Atomic operations
+   - Validated state changes
+   - Protected against common vulnerabilities
+
+## Testing
+
+1. Run test suite:
+```bash
+clarinet test
+```
+
+2. Example test cases:
+```clarity
+(test-mint)
+(test-list-token)
+(test-buy-token)
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open Pull Request
+
+
